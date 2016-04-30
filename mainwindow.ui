@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1187</width>
+    <height>643</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Smell Detector - Timetable Setup</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Classes</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTableWidget" name="classTable">
+          <column>
+           <property name="text">
+            <string>Class Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Year Group</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Number Of Boys</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Number Of Girls</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="addButton">
+            <property name="text">
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="deleteButton">
+            <property name="text">
+             <string>Delete Last Row</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveButton">
+            <property name="text">
+             <string>Save</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Timetable</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QTableWidget" name="weekOneTable">
+             <row>
+              <property name="text">
+               <string>P1</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P2</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Form</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P3</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P4</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Lunch</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P5</string>
+              </property>
+             </row>
+             <column>
+              <property name="text">
+               <string>Monday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Tuesday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Wednesday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Thursday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Friday</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="weekTwoTable">
+             <row>
+              <property name="text">
+               <string>P1</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P2</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Form</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P3</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P4</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Lunch</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>P5</string>
+              </property>
+             </row>
+             <column>
+              <property name="text">
+               <string>Monday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Tuesday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Wednesday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Thursday</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Friday</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="saveButton_2">
+               <property name="text">
+                <string>Save Config</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="loadButton">
+               <property name="text">
+                <string>Load Config</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="compleateButton">
+               <property name="text">
+                <string>Done</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

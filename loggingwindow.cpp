@@ -2,6 +2,8 @@
 #include "ui_loggingwindow.h"
 #include "QTime"
 #include "QtWidgets"
+#include <QFileDialog>
+#include <QFile>
 
 LoggingWindow::LoggingWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -208,7 +210,33 @@ void LoggingWindow::setupLogTimer(LogEvent *LOGEVENT)
 
 void LoggingWindow::saveBackup()
 {
+    QString fileName = QDateTime::currentDateTime().toString("MM/dd/hh-mm.backup");
+    if (ui->overwriteBackups) {
+        fileName = "backup.backup";
+    }
+    QString fullPath = QString("%1/%2").arg(backupFolder, fileName);
 
+    QFile backup(fullPath, this);
+
+    if (QFile::exists(fullPath)) {
+        QFile::remove(fullPath);
+    }
+
+    QTextStream stream(&backup);
+
+    if (backup.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        for (int i; i < dataPointer; i++) {
+            stream << data[i]->timeOfLog().toString("hh:mm dd/MM") << ", "
+                   << data[i]->airQuality() << ", "
+                   << data[i]->deltaAirQuality() << ", "
+                   << data[i]->className() << ", "
+                   << data[i]->year() << ", "
+                   << data[i]->percentOfBoys() << "\n";
+        }
+        backup.flush();
+        backup.close();
+        logsSinceLastBackup = 0;
+    }
 }
 
 void LoggingWindow::on_showHideParentButton_clicked()
@@ -225,7 +253,15 @@ void LoggingWindow::on_enableBackups_clicked()
     ui->overwriteBackups->setEnabled(!ui->overwriteBackups->isEnabled());
     ui->logsPerBackup->setEnabled(!ui->logsPerBackup->isEnabled());
     ui->loadBackupButton->setEnabled(!ui->loadBackupButton->isEnabled());
-    ui->setBackupFrequency->setEnabled(!ui->setBackupFrequency->isEnabled());
+
+    if (ui->enableBackups->isChecked()){
+        backupFolder = QFileDialog::getExistingDirectory(this, "Backup Folder", QDir::currentPath());
+        qDebug() << backupFolder;
+        if (backupFolder == "") {
+            ui->enableBackups->setChecked(false);
+            this->on_enableBackups_clicked();
+        }
+    }
 }
 
 void LoggingWindow::on_startLoggingButton_clicked()
@@ -289,5 +325,5 @@ void LoggingWindow::on_Log()
 
     dataPointer++;
     logsSinceLastBackup++;
-    if (logsSinceLastBackup >= ui->logsPerBackup->text().toInt()) { this->saveBackup(); }
+    if (logsSinceLastBackup >= ui->logsPerBackup->text().toInt() && ui->enableBackups->isChecked()) { this->saveBackup(); }
 }

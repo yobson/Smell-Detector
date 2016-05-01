@@ -11,10 +11,14 @@ LoggingWindow::LoggingWindow(QWidget *parent) :
     timetableIndex = new int[255];
     eventList = new LogEvent*[70];
     data = new DataPoint*[2048];
+    eventToPass = new LogEvent(this);
     numberOfEvents = 0;
     parentWindowStatus = true;
     loggingStatus = false;
     dataPointer = 0;
+    lastValue = 0;
+    logsSinceLastBackup = 0;
+    backupFolder = "";
 
     p1 = new QTime(9,15,0,0);
     p2 = new QTime(10,15,0,0);
@@ -36,6 +40,7 @@ LoggingWindow::~LoggingWindow()
     for (int i = 0; i < 2048; i++) {
         delete data[i];
     }
+    delete eventToPass;
     delete[] data;
     delete[] classArray;
     delete[] timetableIndex;
@@ -117,9 +122,9 @@ void LoggingWindow::on_importButton_clicked()
             break;
         }
     }
-    statusBox->setText("x");
+    statusBox->setText("Next");
     ui->logPlanTable->setItem(nextActiveSlot, 2, statusBox);
-    ui->nextLogLabel->setText(QString("Next Log: %1").arg(eventList[indexOfNextLog]->logDateTime().toString("hh:mm dd/MM/yy")));
+    ui->nextLogLabel->setText(QString("Next Log: %1").arg(eventList[indexOfNextLog]->logDateTime().toString("hh:mm dd/MM")));
 
     ui->startLoggingButton->setEnabled(true);
 }
@@ -190,7 +195,18 @@ QDate LoggingWindow::dateFromDay(int day)
     return QDate::currentDate().addDays(daysToAdd);
 }
 
-void LoggingWindow::setupLogTimer(LogEvent *logEvent)
+void LoggingWindow::setupLogTimer(LogEvent *LOGEVENT)
+{
+    if (loggingStatus) {
+        eventToPass = LOGEVENT;
+        QTimer::singleShot(QDateTime::currentDateTime().msecsTo(eventList[indexOfNextLog]->logDateTime()), this, SLOT(on_Log()));
+        qDebug() << "Set next log to happen at " << eventList[indexOfNextLog]->logDateTime().toString()
+                 << " in " << QDateTime::currentDateTime().msecsTo(eventList[indexOfNextLog]->logDateTime())
+                 << " mSecs";
+    }
+}
+
+void LoggingWindow::saveBackup()
 {
 
 }
@@ -217,6 +233,7 @@ void LoggingWindow::on_startLoggingButton_clicked()
     if (!loggingStatus) {
         loggingStatus = true;
         ui->startLoggingButton->setText("Stop Logging");
+        this->setupLogTimer(eventList[indexOfNextLog]);
     }
     else if (loggingStatus) {
         loggingStatus = false;
@@ -224,7 +241,53 @@ void LoggingWindow::on_startLoggingButton_clicked()
     }
 }
 
-void LoggingWindow::on_Log(LogEvent *logEvent)
+void LoggingWindow::on_Log()
 {
+    qDebug() << "Logging! Time of this log is: " << QDateTime::currentDateTime().toString();
+    data[dataPointer] = new DataPoint();
+    data[dataPointer]->addData(eventToPass, 0, lastValue);
+    lastValue = 0;
 
+    ui->logDataTable->setRowCount(ui->logDataTable->rowCount()+1);
+
+    QTableWidgetItem *className = new QTableWidgetItem();
+    QTableWidgetItem *qualityOfAir = new QTableWidgetItem();
+    QTableWidgetItem *deltaQuality = new QTableWidgetItem();
+    QTableWidgetItem *year = new QTableWidgetItem();
+    QTableWidgetItem *percentBoys = new QTableWidgetItem();
+    QTableWidgetItem *timeOfLog = new QTableWidgetItem();
+    QTableWidgetItem *nextCell = new QTableWidgetItem();
+    QTableWidgetItem *blankCell = new QTableWidgetItem();
+    QTableWidgetItem *nextLog = new QTableWidgetItem();
+
+    className->setText(data[dataPointer]->className());
+    qualityOfAir->setText(QString("%1").arg(data[dataPointer]->airQuality()));
+    deltaQuality->setText(QString("%1").arg(data[dataPointer]->deltaAirQuality()));
+    year->setText(QString("%1").arg(data[dataPointer]->year()));
+    percentBoys->setText(QString("%1").arg(data[dataPointer]->percentOfBoys()));
+    timeOfLog->setText(data[dataPointer]->timeOfLog().toString("hh:mm dd/MM"));
+
+    ui->logDataTable->setItem(dataPointer, 0, timeOfLog);
+    ui->logDataTable->setItem(dataPointer, 1, qualityOfAir);
+    ui->logDataTable->setItem(dataPointer, 2, deltaQuality);
+    ui->logDataTable->setItem(dataPointer, 3, className);
+    ui->logDataTable->setItem(dataPointer, 4, year);
+    ui->logDataTable->setItem(dataPointer, 5, percentBoys);
+
+    nextCell->setText("Next");
+    eventList[indexOfNextLog]->setLogDateTime((eventList[indexOfNextLog]->logDateTime().addDays(14)));
+    nextLog->setText(eventList[indexOfNextLog]->logDateTime().toString());
+
+    ui->logPlanTable->setItem(eventToPass->slotID()+1, 2, nextCell);
+    ui->logPlanTable->setItem(eventToPass->slotID(), 2, blankCell);
+    ui->logPlanTable->setItem(eventToPass->slotID(), 1, nextLog);
+
+    indexOfNextLog ++;
+
+    this->setupLogTimer(eventList[indexOfNextLog]);
+    ui->nextLogLabel->setText(QString("Next Log: %1").arg(eventList[indexOfNextLog]->logDateTime().toString("hh:mm dd/MM")));
+
+    dataPointer++;
+    logsSinceLastBackup++;
+    if (logsSinceLastBackup >= ui->logsPerBackup->text().toInt()) { this->saveBackup(); }
 }

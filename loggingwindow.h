@@ -30,8 +30,7 @@ private slots:
     void on_showHideParentButton_clicked();
     void on_enableBackups_clicked();
     void on_startLoggingButton_clicked();
-
-    void on_Log(LogEvent *logEvent);
+    void on_Log();
 
 private:
     Ui::LoggingWindow *ui;
@@ -39,16 +38,21 @@ private:
     int *timetableIndex;
     DataPoint **data;
     LogEvent **eventList;
+    LogEvent *eventToPass;
     int indexOfNextLog;
     int numberOfEvents;
     int dataPointer;
+    int logsSinceLastBackup;
+    double lastValue;
     bool parentWindowStatus;
     bool loggingStatus;
+    QString backupFolder;
 
     int timetableSlotFromTime(QTime time);
     QTime timeFromTimetableSlot(int i);
     QDate dateFromDay(int day);
-    void setupLogTimer(LogEvent *logEvent);
+    void setupLogTimer(LogEvent *LOGEVENT);
+    void saveBackup();
 
 
     QTime *p1;

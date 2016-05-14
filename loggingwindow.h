@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QDate>
 #include <QTimer>
+#include "graph.h"
 
 namespace Ui {
 class LoggingWindow;
@@ -31,6 +32,9 @@ private slots:
     void on_enableBackups_clicked();
     void on_startLoggingButton_clicked();
     void on_Log();
+    void on_loadBackupButton_clicked();
+    void on_addGraphButton_clicked();
+    void removeGraph(int id);
 
 private:
     Ui::LoggingWindow *ui;
@@ -39,20 +43,24 @@ private:
     DataPoint **data;
     LogEvent **eventList;
     LogEvent *eventToPass;
+    Graph **graphs;
     int indexOfNextLog;
     int numberOfEvents;
     int dataPointer;
     int logsSinceLastBackup;
     double lastValue;
+    int graphTracker;
     bool parentWindowStatus;
     bool loggingStatus;
     QString backupFolder;
+    QDateTime logStart;
 
     int timetableSlotFromTime(QTime time);
     QTime timeFromTimetableSlot(int i);
     QDate dateFromDay(int day);
     void setupLogTimer(LogEvent *LOGEVENT);
     void saveBackup();
+    void addToTable(QString className, double airQuality, double deltaAirQuality, int year, int boys, int girls, QDateTime TimeOfLog);
 
 
     QTime *p1;
@@ -65,6 +73,7 @@ private:
 
 signals:
     void showHideWindow();
+    void updateGraphs(DataPoint *data);
 
 };
 

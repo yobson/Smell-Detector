@@ -79,7 +79,12 @@
            </column>
            <column>
             <property name="text">
-             <string>% Boys</string>
+             <string>Boys</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Girls</string>
             </property>
            </column>
           </widget>
@@ -249,7 +254,7 @@
            <item>
             <widget class="QPushButton" name="loadBackupButton">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>Load Backup</string>
@@ -312,6 +317,11 @@
               </item>
               <item>
                <property name="text">
+                <string>Air Quality Per Child</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
                 <string>Δ Air Quality</string>
                </property>
               </item>
@@ -322,9 +332,21 @@
               </item>
               <item>
                <property name="text">
-                <string>% Boys</string>
+                <string>Boys</string>
                </property>
               </item>
+              <item>
+               <property name="text">
+                <string>Girls</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="xInverted">
+              <property name="text">
+               <string>Inverted</string>
+              </property>
              </widget>
             </item>
             <item>
@@ -354,6 +376,11 @@
               </item>
               <item>
                <property name="text">
+                <string>Air Quality Per Child</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
                 <string>Δ Air Quality</string>
                </property>
               </item>
@@ -364,9 +391,21 @@
               </item>
               <item>
                <property name="text">
-                <string>% Boys</string>
+                <string>Boys</string>
                </property>
               </item>
+              <item>
+               <property name="text">
+                <string>Girls</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="yInverted">
+              <property name="text">
+               <string>Inverted</string>
+              </property>
              </widget>
             </item>
            </layout>

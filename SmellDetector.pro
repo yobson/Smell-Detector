@@ -18,14 +18,16 @@ SOURCES += main.cpp\
     class.cpp \
     loggingwindow.cpp \
     logevent.cpp \
-    datapoint.cpp
+    datapoint.cpp \
+    graph.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
     class.h \
     loggingwindow.h \
     logevent.h \
-    datapoint.h
+    datapoint.h \
+    graph.h
 
 FORMS    += mainwindow.ui \
     loggingwindow.ui

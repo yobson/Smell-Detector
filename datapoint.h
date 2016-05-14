@@ -14,11 +14,13 @@ public:
 
 
     void addData(LogEvent *logObject, double qualityOfAir, double lastValue);
+    void addBackupData(QString line);
 
     double airQuality();
     double deltaAirQuality();
     int year();
-    double percentOfBoys();
+    int boys();
+    int girls();
     QString className();
     QDateTime timeOfLog();
 
@@ -28,7 +30,8 @@ private:
     double AIRQUALITY;
     double DELTAAIRQUALITY;
     int YEAR;
-    double PERCENTOFBOYS;
+    int BOYS;
+    int GIRLS;
     QString CLASSNAME;
     QDateTime TIMEOFLOG;
 

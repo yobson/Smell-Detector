@@ -23,6 +23,7 @@ LoggingWindow::LoggingWindow(QWidget *parent) :
     logsSinceLastBackup = 0;
     graphTracker = 0;
     backupFolder = "";
+    logStart = QDateTime::currentDateTime();
 
     p1 = new QTime(9,15,0,0);
     p2 = new QTime(10,15,0,0);
@@ -229,7 +230,7 @@ void LoggingWindow::saveBackup()
     QTextStream stream(&backup);
 
     if (backup.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        for (int i; i < dataPointer; i++) {
+        for (int i = 0; i < dataPointer; i++) {
             stream << data[i]->timeOfLog().toString("hh:mm dd/MM") << ", "
                    << data[i]->airQuality() << ", "
                    << data[i]->deltaAirQuality() << ", "
@@ -308,7 +309,6 @@ void LoggingWindow::on_startLoggingButton_clicked()
     else if (loggingStatus) {
         loggingStatus = false;
         ui->startLoggingButton->setText("Continue Logging");
-        if (!logStart) { logStart = QDateTime::currentDateTime(); }
     }
 }
 
@@ -367,6 +367,7 @@ void LoggingWindow::on_loadBackupButton_clicked()
                 QString line = fileInput.readLine();
                 data[dataPointer] = new DataPoint(this);
                 data[dataPointer]->addBackupData(line);
+                emit updateGraphs(data[dataPointer]);
 
                 this->addToTable(data[dataPointer]->className(),
                                  data[dataPointer]->airQuality(),
@@ -443,11 +444,14 @@ void LoggingWindow::on_addGraphButton_clicked()
     if (ui->yInverted->isChecked()) {
         y = QString("1 / %1").arg(y);
     }
+
+    qDebug() << "HERE!";
+
     graphs[graphTracker]->setAxisTitles(x, y);
     graphs[graphTracker]->setAxisTypes(ui->xValueBox->currentIndex(), ui->xInverted->isChecked(), ui->yValueBox->currentIndex(), ui->yInverted->isChecked());
     graphs[graphTracker]->setID(graphTracker);
-    graphs[graphTracker]->getAllData(data, dataPointer);
     graphs[graphTracker]->setTimeRef(logStart);
+    graphs[graphTracker]->getAllData(data, dataPointer);
 
     connect(graphs[graphTracker], SIGNAL(deleteTab(int)), this, SLOT(removeGraph(int)));
     connect(this, SIGNAL(updateGraphs(DataPoint*)), graphs[graphTracker], SLOT(addDataPoint(DataPoint*)));

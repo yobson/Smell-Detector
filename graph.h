@@ -28,8 +28,6 @@ private:
     int id;
     QVector<double> xValues;
     QVector<double> yValues;
-    double maxXValue;
-    double maxYValue;
     QString GRAPHTITLE;
     QDateTime startOfLogging;
 

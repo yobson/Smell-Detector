@@ -5,6 +5,10 @@ Graph::Graph(QObject *parent) : QObject(parent)
 {
     xValues.resize(2048);
     yValues.resize(2048);
+    maxXValue = 4.8;
+    maxYValue = 4.8;
+    minXValue = 0.0;
+    minXValue = 0.0;
     numberOfPoints = 0;
 
     deleteButton = new QPushButton();
@@ -76,7 +80,7 @@ void Graph::dataPointToXY(DataPoint *data) {
     double Data = 0;
     switch (xAxisType) {
     case 0:
-        Data = (float)startOfLogging.secsTo(QDateTime::currentDateTime());
+        Data = (float)startOfLogging.secsTo(data->timeOfLog());
         break;
     case 1:
         Data = data->airQuality();
@@ -100,10 +104,21 @@ void Graph::dataPointToXY(DataPoint *data) {
     if (xInverted) { Data = 1/Data; }
     xValues[numberOfPoints] = Data;
 
+    if (Data >= maxXValue) {
+        maxXValue = Data + 1;
+        qDebug() << "New MaxX:" << maxXValue;
+    }
+    if (Data <= minXValue) {
+        minXValue = Data - 1;
+        qDebug() << "New MaxX:" << minXValue;
+    }
+
+    qDebug() << "Adding Point x=" << Data;
+
 
     switch (yAxisType) {
     case 0:
-        Data = (float)startOfLogging.secsTo(QDateTime::currentDateTime());
+        Data = (float)startOfLogging.secsTo(data->timeOfLog());
         break;
     case 1:
         Data = data->airQuality();
@@ -126,9 +141,23 @@ void Graph::dataPointToXY(DataPoint *data) {
     }
     if (yInverted) { Data = 1/Data; }
     yValues[numberOfPoints] = Data;
+
+    if (Data >= maxYValue) {
+        maxYValue = Data + 1;
+        qDebug() << "New MaxY:" << maxYValue;
+    }
+    if (Data <= minYValue) {
+        minYValue = Data - 1;
+        qDebug() << "New MinY:" << minYValue;
+    }
+
+    qDebug() << "Adding Point y=" << Data;
     numberOfPoints++;
-    graph->replot();
+    //graph->xAxis->setRange(minXValue, maxXValue);
+    //graph->yAxis->setRange(minYValue, maxYValue);
+    graph->graph(0)->setData(xValues, yValues);
     graph->rescaleAxes();
+    graph->replot();
 }
 
 void Graph::addDataPoint(DataPoint *newData) {

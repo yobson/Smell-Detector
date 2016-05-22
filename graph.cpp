@@ -76,7 +76,7 @@ void Graph::dataPointToXY(DataPoint *data) {
     double Data = 0;
     switch (xAxisType) {
     case 0:
-        Data = (float)startOfLogging.secsTo(data->timeOfLog());
+        Data = (float)(startOfLogging.secsTo(data->timeOfLog()))/1000;
         break;
     case 1:
         Data = data->airQuality();
@@ -103,7 +103,7 @@ void Graph::dataPointToXY(DataPoint *data) {
 
     switch (yAxisType) {
     case 0:
-        Data = (float)startOfLogging.secsTo(data->timeOfLog());
+        Data = (float)(startOfLogging.secsTo(data->timeOfLog()))/1000;
         break;
     case 1:
         Data = data->airQuality();

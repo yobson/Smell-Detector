@@ -70,7 +70,7 @@ void LoggingWindow::setTimetableIndex(int *index) {
 
 void LoggingWindow::on_getTimeButton_clicked()
 {
-    ui->currentTimeLabel->setText(QTime::currentTime().toString());
+    ui->currentTimeLabel->setText(QDateTime::currentDateTime().toString("hh:mm dd/MM/yy"));
 }
 
 void LoggingWindow::on_importButton_clicked()
@@ -80,16 +80,20 @@ void LoggingWindow::on_importButton_clicked()
 
     QTableWidgetItem *statusBox = new QTableWidgetItem();
     int today = QDate::currentDate().dayOfWeek();
-    int nextActiveSlot = 0;
-    if (ui->week2Button->isChecked()) { today += 5; }
-    int slot = timetableSlotFromTime(QTime::currentTime());
-    if (slot == 7) {
-            today ++;
-            slot = 0;
-    }
-    if (today < 11) {
-        nextActiveSlot = ((today-1)*7)+slot;
-    }
+    bool weekend = false;
+    if (today > 5) { today = 5; weekend = true; }
+    int nextActiveSlot = (today-1)*7;
+    if (!weekend) { nextActiveSlot += this->timetableSlotFromTime(QTime::currentTime()); }
+    else { nextActiveSlot = 35; }
+    if (ui->week2Button->isChecked()) { nextActiveSlot += 35; }
+    if (nextActiveSlot >= 70) { nextActiveSlot = 0; }
+
+
+
+
+    QDate dayOne = this->dateFromDay(1).addDays(7);
+    int offset=7;
+    if (ui->week1Button->isChecked()) { offset += 7; }
 
 
     for (int i=0; i < 70; i++) {
@@ -98,14 +102,12 @@ void LoggingWindow::on_importButton_clicked()
 
         if (timetableIndex[i] != -1) {
             className->setText(classArray[timetableIndex[i]]->name());
-            QDateTime slotDateTime;
-            QDate slotDate;
+
             int ii = i;
-            if (i > 34) { ii = i - 35; }
-            int day = (ii/7)+1;
-            if (i < nextActiveSlot) { slotDate = QDate(this->dateFromDay(day)).addDays(7); }
-            else { slotDate = QDate(this->dateFromDay(day)); }
-            slotDateTime = QDateTime(slotDate, this->timeFromTimetableSlot(i));
+            if (i > 34) {ii = i + 14; }
+            int day = ii/7;
+            if (i >= nextActiveSlot) { day = day - offset; }
+            QDateTime slotDateTime = QDateTime(dayOne.addDays(day), this->timeFromTimetableSlot(i));
             nextLog->setText(slotDateTime.toString());
             ui->logPlanTable->setItem(i, 1, nextLog);
             eventList[numberOfEvents] = new LogEvent(this);
@@ -129,7 +131,7 @@ void LoggingWindow::on_importButton_clicked()
             break;
         }
     }
-    statusBox->setText("Next");
+    statusBox->setText("Next Log Time");
     ui->logPlanTable->setItem(nextActiveSlot, 2, statusBox);
     ui->nextLogLabel->setText(QString("Next Log: %1").arg(eventList[indexOfNextLog]->logDateTime().toString("hh:mm dd/MM")));
 
@@ -162,8 +164,8 @@ int LoggingWindow::timetableSlotFromTime(QTime time) {
     else {
         returnInt = 7;
     }
-
     return returnInt;
+
 }
 
 QTime LoggingWindow::timeFromTimetableSlot(int i) {
@@ -197,7 +199,8 @@ QTime LoggingWindow::timeFromTimetableSlot(int i) {
 
 QDate LoggingWindow::dateFromDay(int day)
 {
-    int daysToAdd = day - QDate::currentDate().dayOfWeek();
+    int today = QDate::currentDate().dayOfWeek();
+    int daysToAdd = day - today;
     if (daysToAdd < 0) { daysToAdd += 7; }
     return QDate::currentDate().addDays(daysToAdd);
 }
@@ -231,7 +234,7 @@ void LoggingWindow::saveBackup()
 
     if (backup.open(QIODevice::WriteOnly | QIODevice::Text)) {
         for (int i = 0; i < dataPointer; i++) {
-            stream << data[i]->timeOfLog().toString("hh:mm dd/MM") << ", "
+            stream << data[i]->timeOfLog().toString("hh:mm dd/MM/yy") << ", "
                    << data[i]->airQuality() << ", "
                    << data[i]->deltaAirQuality() << ", "
                    << data[i]->className() << ", "
@@ -264,7 +267,7 @@ void LoggingWindow::addToTable(QString ClassName, double airQuality, double delt
     year->setText(QString("%1").arg(Year));
     Boys->setText(QString("%1").arg(boys));
     Girls->setText(QString("%1").arg(girls));
-    timeOfLog->setText(TimeOfLog.toString("hh:mm dd/MM"));
+    timeOfLog->setText(TimeOfLog.toString("hh:mm dd/MM/yy"));
 
     ui->logDataTable->setItem(row, 0, timeOfLog);
     ui->logDataTable->setItem(row, 1, qualityOfAir);
@@ -332,7 +335,7 @@ void LoggingWindow::on_Log()
     QTableWidgetItem *blankCell = new QTableWidgetItem();
     QTableWidgetItem *nextLog = new QTableWidgetItem();
 
-    nextCell->setText("Next");
+    nextCell->setText("Next Log Time");
     eventList[indexOfNextLog]->setLogDateTime((eventList[indexOfNextLog]->logDateTime().addDays(14)));
     nextLog->setText(eventList[indexOfNextLog]->logDateTime().toString());
 
@@ -343,7 +346,7 @@ void LoggingWindow::on_Log()
     indexOfNextLog ++;
 
     this->setupLogTimer(eventList[indexOfNextLog]);
-    ui->nextLogLabel->setText(QString("Next Log: %1").arg(eventList[indexOfNextLog]->logDateTime().toString("hh:mm dd/MM")));
+    ui->nextLogLabel->setText(QString("Next Log: %1").arg(eventList[indexOfNextLog]->logDateTime().toString("hh:mm dd/MM/yy")));
 
     dataPointer++;
     logsSinceLastBackup++;
@@ -364,6 +367,7 @@ void LoggingWindow::on_loadBackupButton_clicked()
 
         if (backupFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
             while (!fileInput.atEnd()) {
+                qDebug() << "Loading line of Backup File";
                 QString line = fileInput.readLine();
                 data[dataPointer] = new DataPoint(this);
                 data[dataPointer]->addBackupData(line);

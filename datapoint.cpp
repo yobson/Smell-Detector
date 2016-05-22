@@ -18,7 +18,7 @@ void DataPoint::addData(LogEvent *logObject, double qualityOfAir, double lastVal
 void DataPoint::addBackupData(QString line)
 {
     QStringList splitLine = line.split(", ");
-    TIMEOFLOG = QDateTime::fromString(splitLine.value(0), "hh:mm dd/MM");
+    TIMEOFLOG = QDateTime::fromString(splitLine.value(0), "hh:mm dd/MM/yy").addYears(100);
     AIRQUALITY = QString(splitLine.value(1)).toDouble();
     DELTAAIRQUALITY = QString(splitLine.value(2)).toDouble();
     CLASSNAME = splitLine.value(3);

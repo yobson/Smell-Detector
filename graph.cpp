@@ -3,8 +3,6 @@
 
 Graph::Graph(QObject *parent) : QObject(parent)
 {
-    xValues.resize(2048);
-    yValues.resize(2048);
     numberOfPoints = 0;
 
     deleteButton = new QPushButton();
@@ -73,6 +71,8 @@ QTabWidget *Graph::getGUI()
 
 
 void Graph::dataPointToXY(DataPoint *data) {
+    xValues.resize(numberOfPoints+1);
+    yValues.resize(numberOfPoints+1);
     double Data = 0;
     switch (xAxisType) {
     case 0:

@@ -15,7 +15,6 @@ LoggingWindow::LoggingWindow(QWidget *parent) :
     data = new DataPoint*[2048];
     graphs = new Graph*[255];
     eventToPass = new LogEvent(this);
-    numberOfEvents = 0;
     parentWindowStatus = true;
     loggingStatus = false;
     dataPointer = 0;
@@ -75,6 +74,7 @@ void LoggingWindow::on_getTimeButton_clicked()
 
 void LoggingWindow::on_importButton_clicked()
 {
+    numberOfEvents = 0;
     ui->logPlanTable->setRowCount(0);
     ui->logPlanTable->setRowCount(70);
 
@@ -91,9 +91,8 @@ void LoggingWindow::on_importButton_clicked()
 
 
 
-    QDate dayOne = this->dateFromDay(1).addDays(7);
-    int offset=7;
-    if (ui->week1Button->isChecked()) { offset += 7; }
+    QDate dayOne = this->dateFromDay(1);
+    if (ui->week1Button->isChecked()) { dayOne = dayOne.addDays(7); }
 
 
     for (int i=0; i < 70; i++) {
@@ -106,7 +105,7 @@ void LoggingWindow::on_importButton_clicked()
             int ii = i;
             if (i > 34) {ii = i + 14; }
             int day = ii/7;
-            if (i >= nextActiveSlot) { day = day - offset; }
+            if (i >= nextActiveSlot) { day = day - 14; }
             QDateTime slotDateTime = QDateTime(dayOne.addDays(day), this->timeFromTimetableSlot(i));
             nextLog->setText(slotDateTime.toString());
             ui->logPlanTable->setItem(i, 1, nextLog);
@@ -201,7 +200,7 @@ QDate LoggingWindow::dateFromDay(int day)
 {
     int today = QDate::currentDate().dayOfWeek();
     int daysToAdd = day - today;
-    if (daysToAdd < 0) { daysToAdd += 7; }
+    if (daysToAdd <= 0) { daysToAdd += 7; }
     return QDate::currentDate().addDays(daysToAdd);
 }
 
@@ -339,11 +338,14 @@ void LoggingWindow::on_Log()
     eventList[indexOfNextLog]->setLogDateTime((eventList[indexOfNextLog]->logDateTime().addDays(14)));
     nextLog->setText(eventList[indexOfNextLog]->logDateTime().toString());
 
-    ui->logPlanTable->setItem(eventToPass->slotID()+1, 2, nextCell);
+    indexOfNextLog ++;
+    if (indexOfNextLog > numberOfEvents) {
+        indexOfNextLog = 0;
+    }
+
+    ui->logPlanTable->setItem(eventList[indexOfNextLog], 2, nextCell);
     ui->logPlanTable->setItem(eventToPass->slotID(), 2, blankCell);
     ui->logPlanTable->setItem(eventToPass->slotID(), 1, nextLog);
-
-    indexOfNextLog ++;
 
     this->setupLogTimer(eventList[indexOfNextLog]);
     ui->nextLogLabel->setText(QString("Next Log: %1").arg(eventList[indexOfNextLog]->logDateTime().toString("hh:mm dd/MM/yy")));

@@ -14,6 +14,7 @@ LoggingWindow::LoggingWindow(QWidget *parent) :
     eventList = new LogEvent*[70];
     data = new DataPoint*[2048];
     graphs = new Graph*[255];
+    barGraphs = new BarGraph*[255];
     eventToPass = new LogEvent(this);
     parentWindowStatus = true;
     loggingStatus = false;
@@ -21,8 +22,10 @@ LoggingWindow::LoggingWindow(QWidget *parent) :
     lastValue = 0;
     logsSinceLastBackup = 0;
     graphTracker = 0;
+    barGraphTracker = 0;
     backupFolder = "";
     logStart = QDateTime::currentDateTime();
+    barChart = false;
 
     p1 = new QTime(9,15,0,0);
     p2 = new QTime(10,15,0,0);
@@ -38,6 +41,7 @@ LoggingWindow::~LoggingWindow()
     for (int i=0; i < 255; i++) {
         delete classArray[i];
         delete graphs[i];
+        delete barGraphs[i];
     }
     for (int i = 0; i < 70; i++) {
         delete eventList[i];
@@ -51,6 +55,7 @@ LoggingWindow::~LoggingWindow()
     delete[] timetableIndex;
     delete[] eventList;
     delete[] graphs;
+    delete[] barGraphs;
 
     delete ui;
 }
@@ -343,7 +348,7 @@ void LoggingWindow::on_Log()
         indexOfNextLog = 0;
     }
 
-    ui->logPlanTable->setItem(eventList[indexOfNextLog], 2, nextCell);
+    ui->logPlanTable->setItem(eventList[indexOfNextLog]->slotID(), 2, nextCell);
     ui->logPlanTable->setItem(eventToPass->slotID(), 2, blankCell);
     ui->logPlanTable->setItem(eventToPass->slotID(), 1, nextLog);
 
@@ -382,7 +387,7 @@ void LoggingWindow::on_loadBackupButton_clicked()
                                  data[dataPointer]->boys(),
                                  data[dataPointer]->girls(),
                                  data[dataPointer]->timeOfLog());
-
+                lastValue = data[dataPointer]->airQuality();
                 dataPointer++;
 
 
@@ -394,37 +399,64 @@ void LoggingWindow::on_loadBackupButton_clicked()
 
 void LoggingWindow::on_addGraphButton_clicked()
 {
+    if (!barChart) {
+        this->addSkatterGraph();
+    }
+    else {
+        this->addBarChart();
+    }
+}
+
+void LoggingWindow::addSkatterGraph()
+{
     graphs[graphTracker] = new Graph(this);
     graphs[graphTracker]->setGraphTitle(ui->graphNameText->text());
     QString x, y;
-    switch (ui->xValueBox->currentIndex()) {
-    case 0:
-        x = "Time";
-        break;
-    case 1:
-        x = "Air Quality";
-        break;
-    case 2:
-        x = "Air Quality per Child";
-        break;
-    case 3:
-        x = "Change in Air Quality";
-        break;
-    case 4:
-        x = "Year";
-        break;
-    case 5:
-        x = "Boys";
-        break;
-    case 6:
-        x = "Girls";
-        break;
-    }
+    x = this->getAxisTitle(ui->xValueBox->currentIndex());
     if (ui->xInverted->isChecked()) {
         x = QString("1 / %1").arg(x);
     }
 
-    switch (ui->yValueBox->currentIndex()) {
+    y = this->getAxisTitle(ui->yValueBox->currentIndex());
+    if (ui->yInverted->isChecked()) {
+        y = QString("1 / %1").arg(y);
+    }
+
+    qDebug() << "HERE!";
+
+    graphs[graphTracker]->setAxisTitles(x, y);
+    graphs[graphTracker]->setAxisTypes(ui->xValueBox->currentIndex(), ui->xInverted->isChecked(), ui->yValueBox->currentIndex(), ui->yInverted->isChecked());
+    graphs[graphTracker]->setID(graphTracker);
+    graphs[graphTracker]->setTimeRef(logStart);
+    graphs[graphTracker]->getAllData(data, dataPointer);
+
+    connect(graphs[graphTracker], SIGNAL(deleteTab(int)), this, SLOT(removeGraph(int)));
+    connect(this, SIGNAL(updateGraphs(DataPoint*)), graphs[graphTracker], SLOT(addDataPoint(DataPoint*)));
+
+    ui->graphTabWidget->addTab(graphs[graphTracker]->getGUI(), ui->graphNameText->text());
+    graphTracker++;
+}
+
+void LoggingWindow::addBarChart() {
+    barGraphs[barGraphTracker] = new BarGraph(this);
+    barGraphs[barGraphTracker]->setID(barGraphTracker);
+    barGraphs[barGraphTracker]->setInverted(ui->yInverted);
+    barGraphs[barGraphTracker]->setType(ui->yValueBox->currentIndex());
+    barGraphs[barGraphTracker]->setTimeRef(logStart);
+    barGraphs[barGraphTracker]->setAxisName(this->getAxisTitle(ui->yValueBox->currentIndex()));
+    connect(barGraphs[barGraphTracker], SIGNAL(deleteChart(int)), this, SLOT(removeBarGraph(int)));
+    connect(this, SIGNAL(updateGraphs(DataPoint*)), barGraphs[barGraphTracker], SLOT(addData(DataPoint*)));
+
+    barGraphs[barGraphTracker]->getAllData(data, dataPointer);
+
+    ui->graphTabWidget->addTab(barGraphs[barGraphTracker]->getGUI(), ui->graphNameText->text());
+    barGraphTracker++;
+}
+
+QString LoggingWindow::getAxisTitle(int i)
+{
+    QString y;
+    switch (i) {
     case 0:
         y = "Time";
         break;
@@ -447,26 +479,26 @@ void LoggingWindow::on_addGraphButton_clicked()
         y = "Girls";
         break;
     }
-    if (ui->yInverted->isChecked()) {
-        y = QString("1 / %1").arg(y);
-    }
-
-    qDebug() << "HERE!";
-
-    graphs[graphTracker]->setAxisTitles(x, y);
-    graphs[graphTracker]->setAxisTypes(ui->xValueBox->currentIndex(), ui->xInverted->isChecked(), ui->yValueBox->currentIndex(), ui->yInverted->isChecked());
-    graphs[graphTracker]->setID(graphTracker);
-    graphs[graphTracker]->setTimeRef(logStart);
-    graphs[graphTracker]->getAllData(data, dataPointer);
-
-    connect(graphs[graphTracker], SIGNAL(deleteTab(int)), this, SLOT(removeGraph(int)));
-    connect(this, SIGNAL(updateGraphs(DataPoint*)), graphs[graphTracker], SLOT(addDataPoint(DataPoint*)));
-
-    ui->graphTabWidget->addTab(graphs[graphTracker]->getGUI(), ui->graphNameText->text());
-    graphTracker++;
+    return y;
 }
 
 void LoggingWindow::removeGraph(int id)
 {
     delete graphs[id];
+}
+
+void LoggingWindow::removeBarGraph(int id)
+{
+    delete barGraphs[id];
+}
+
+void LoggingWindow::on_xValueBox_currentIndexChanged(const QString &arg1)
+{
+    if (arg1 == "Year") {
+        ui->addGraphButton->setText("Add Bar Chart");
+        barChart = true;
+    } else {
+        ui->addGraphButton->setText("Add Scatter Graph");
+        barChart = false;
+    }
 }

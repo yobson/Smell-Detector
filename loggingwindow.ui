@@ -413,7 +413,7 @@
           <item>
            <widget class="QPushButton" name="addGraphButton">
             <property name="text">
-             <string>Add Graph</string>
+             <string>Add Scatter Graph</string>
             </property>
            </widget>
           </item>

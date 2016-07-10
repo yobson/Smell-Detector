@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Statistic</class>
+ <widget class="QDialog" name="Statistic">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>202</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="mean">
+     <property name="text">
+      <string>Mean:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="q1">
+     <property name="text">
+      <string>Q1:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="q2">
+     <property name="text">
+      <string>Q2:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="q3">
+     <property name="text">
+      <string>Q3:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="mode">
+     <property name="text">
+      <string>Mode:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="variance">
+     <property name="text">
+      <string>Variance:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="sd">
+     <property name="text">
+      <string>Standard Deviation:</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

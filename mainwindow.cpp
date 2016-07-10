@@ -51,8 +51,11 @@ MainWindow::~MainWindow()
 {
     qDebug() << "Deleting dynamic content of classArray and boxList";
     for (int i = 0; i < 255; i++) {
-        delete classArray[i];
+
         delete boxList[i];
+    }
+    for (int i = 0; i < numberOfClasses; i++) {
+        delete classArray[i];
     }
     qDebug() << "Deleting all arrays";
     delete[] classArray;

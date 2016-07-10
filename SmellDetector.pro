@@ -19,7 +19,9 @@ SOURCES += main.cpp\
     loggingwindow.cpp \
     logevent.cpp \
     datapoint.cpp \
-    graph.cpp
+    graph.cpp \
+    bargraph.cpp \
+    statistic.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -27,7 +29,10 @@ HEADERS  += mainwindow.h \
     loggingwindow.h \
     logevent.h \
     datapoint.h \
-    graph.h
+    graph.h \
+    bargraph.h \
+    statistic.h
 
 FORMS    += mainwindow.ui \
-    loggingwindow.ui
+    loggingwindow.ui \
+    statistic.ui

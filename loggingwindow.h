@@ -9,6 +9,7 @@
 #include <QDate>
 #include <QTimer>
 #include "graph.h"
+#include "bargraph.h"
 
 namespace Ui {
 class LoggingWindow;
@@ -35,6 +36,9 @@ private slots:
     void on_loadBackupButton_clicked();
     void on_addGraphButton_clicked();
     void removeGraph(int id);
+    void removeBarGraph(int id);
+
+    void on_xValueBox_currentIndexChanged(const QString &arg1);
 
 private:
     Ui::LoggingWindow *ui;
@@ -44,16 +48,19 @@ private:
     LogEvent **eventList;
     LogEvent *eventToPass;
     Graph **graphs;
+    BarGraph **barGraphs;
     int indexOfNextLog;
     int numberOfEvents;
     int dataPointer;
     int logsSinceLastBackup;
     double lastValue;
     int graphTracker;
+    int barGraphTracker;
     bool parentWindowStatus;
     bool loggingStatus;
     QString backupFolder;
     QDateTime logStart;
+    bool barChart;
 
     int timetableSlotFromTime(QTime time);
     QTime timeFromTimetableSlot(int i);
@@ -61,6 +68,9 @@ private:
     void setupLogTimer(LogEvent *LOGEVENT);
     void saveBackup();
     void addToTable(QString className, double airQuality, double deltaAirQuality, int year, int boys, int girls, QDateTime TimeOfLog);
+    void addSkatterGraph();
+    void addBarChart();
+    QString getAxisTitle(int i);
 
 
     QTime *p1;
